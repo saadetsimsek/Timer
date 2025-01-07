@@ -17,7 +17,7 @@ class ViewController: UIViewController {
     
     private let lessonLabel: UILabel = {
         let label = UILabel()
-        label.text = "Github Profile"
+        label.text = "Timer "
         label.font = .systemFont(ofSize: 24)
         label.textColor = .black
         label.numberOfLines = 0
@@ -70,9 +70,16 @@ class ViewController: UIViewController {
         startButton.addTarget(self,
                               action: #selector(startButtonTapped),
                               for: .touchUpInside)
+        timerLabel.text = "\(durationTimer)"
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.animationCircular()
     }
     
     @objc func startButtonTapped(){
+        basicAnimation()
         timer = Timer.scheduledTimer(timeInterval: 1,
                                      target: self,
                                      selector: #selector(timerAction),
@@ -91,6 +98,38 @@ class ViewController: UIViewController {
     }
     
     //MARK: -Animation
+    
+    private func animationCircular(){
+        //çizim için merkez ve yol belirleniyor
+        let center = CGPoint(x: shapeView.frame.width / 2,
+                             y: shapeView.frame.height / 2)
+        let endAngle = (-CGFloat.pi / 2) //
+        let startAngle = 2 * CGFloat.pi + endAngle // açıları saat yönüne veya tersi yönüne dairesel bir yol çizmek için kullanılır.
+        let circlePath = UIBezierPath(arcCenter: center,
+                                      radius: 130,
+                                      startAngle: startAngle,
+                                      endAngle: endAngle,
+                                      clockwise: false) //saatin ters yönünde bir yol çizileceğini belirtir.
+        
+        shapeLayer.path = circlePath.cgPath
+        shapeLayer.lineWidth = 21
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeEnd = 1
+        shapeLayer.lineCap = CAShapeLayerLineCap.round
+        shapeLayer.strokeColor = UIColor.red.cgColor
+        shapeView.layer.addSublayer(shapeLayer)
+    }
+    
+    private func basicAnimation(){
+        let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
+        basicAnimation.toValue = 0
+        basicAnimation.duration = CFTimeInterval(durationTimer)
+        basicAnimation.fillMode = CAMediaTimingFillMode.forwards
+        basicAnimation.isRemovedOnCompletion = true
+        shapeLayer.add(basicAnimation, forKey: "basicAnimation")
+    }
+    
+    //MARK: - Constraints
 
     private func setConstraints(){
         NSLayoutConstraint.activate([
